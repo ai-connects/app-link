@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body>
+<script>
+  const ua = navigator.userAgent || navigator.vendor;
+  if (/android/i.test(ua)) {
+    window.location.href = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
+  } else if (/iPad|iPhone|iPod/.test(ua)) {
+    window.location.href = "https://apps.apple.com/us/app/havit-ai-weight-loss-coach/id6755166023";
+  } else {
+    window.location.href = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
+  }
+</script>
+<p>잠시 후 이동합니다...</p>
+</body>
+</html>
