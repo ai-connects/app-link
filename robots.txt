@@ -1,0 +1,12 @@
+# app.aihavit.com — 스토어로 보내는 리디렉터 한 장.
+#
+# 크롤은 일부러 허용한다. index.html 의 <meta name="robots" content="noindex">
+# 로 색인을 막고 있는데, 여기에 Disallow 를 걸면 크롤러가 그 태그를 읽지
+# 못해 noindex 가 무력화된다. URL 만 남은 채 색인에 박히는 최악의 결과가
+# 나오므로, 색인 제어는 메타 한 곳에서만 한다.
+#
+# 사이트맵은 없다. 이 도메인에 색인시킬 페이지가 없기 때문.
+# 실제 컨텐츠는 www.aihavit.com 과 blog.aihavit.com 에 있다.
+
+User-agent: *
+Allow: /

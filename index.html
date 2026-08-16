@@ -1,8 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>HAVIT</title>
+
+  <!--
+    검색에서 빼는 이유: 이 페이지는 본문이 없는 1KB 짜리 리디렉터다. 색인되면
+    "HAVIT 앱" 같은 브랜드 검색에서 홈페이지 대신 이 빈 페이지가 뜰 수 있고,
+    눌러도 스토어로 튕기기만 해서 검색 결과로서 아무 값이 없다.
+
+    robots.txt 의 Disallow 가 아니라 noindex 메타를 쓴 것은 의도적이다.
+    Disallow 를 걸면 크롤러가 페이지를 아예 안 읽어서 이 noindex 를 못 본다.
+    URL 만 남은 채로 색인에 남는 최악이 된다. 크롤은 허용하고 색인만 막는다.
+    follow 는 유지 — 스토어 링크로 나가는 신호는 살려둔다.
+  -->
+  <meta name="robots" content="noindex, follow">
 
   <!-- OG 태그 -->
   <meta property="og:title" content="HAVIT — Your AI Weight Loss Coach" />
@@ -11,17 +24,49 @@
   <meta property="og:url" content="https://app.aihavit.com" />
   <meta property="og:type" content="website" />
 
+  <!-- GA4. blog.aihavit.com / www.aihavit.com 과 같은 속성이라, 유입부터
+       스토어 이탈까지가 한 보고서에서 이어진다. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4NEXM0LNTK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-4NEXM0LNTK');
+  </script>
 </head>
 <body>
 <script>
-  const ua = navigator.userAgent || navigator.vendor;
+  var ANDROID = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
+  var IOS = "https://apps.apple.com/us/app/havit-ai-weight-loss-coach/id6755166023";
+
+  var ua = navigator.userAgent || navigator.vendor;
+  var platform, target;
   if (/android/i.test(ua)) {
-    window.location.href = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
+    platform = "android"; target = ANDROID;
   } else if (/iPad|iPhone|iPod/.test(ua)) {
-    window.location.href = "https://apps.apple.com/us/app/havit-ai-weight-loss-coach/id6755166023";
+    platform = "ios"; target = IOS;
   } else {
-    window.location.href = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
+    platform = "other"; target = ANDROID;
   }
+
+  // 계측과 속도의 절충. gtag 는 async 라 리디렉트가 먼저 일어나면 히트가
+  // 통째로 유실된다. event_callback 으로 전송 직후 넘기되, 스크립트가 아직
+  // 안 떴을 때를 대비해 350ms 에서 무조건 끊는다. 설치 흐름에 이 이상은
+  // 얹을 수 없다. 계측이 이 지연만큼의 값어치가 없다고 판단되면 gtag 호출을
+  // 지우고 go() 를 즉시 부르면 원래 동작으로 돌아간다.
+  var moved = false;
+  function go() {
+    if (moved) return;
+    moved = true;
+    window.location.replace(target);
+  }
+
+  gtag("event", "app_redirect", {
+    platform: platform,
+    event_callback: go,
+    event_timeout: 350
+  });
+  setTimeout(go, 350);
 </script>
 <p>잠시 후 이동합니다...</p>
 </body>
