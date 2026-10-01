@@ -1,31 +1,33 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HAVIT</title>
+  <title>HAVIT — AI Weight Loss Coach</title>
 
   <!--
-    검색에서 빼는 이유: 이 페이지는 본문이 없는 1KB 짜리 리디렉터다. 색인되면
-    "HAVIT 앱" 같은 브랜드 검색에서 홈페이지 대신 이 빈 페이지가 뜰 수 있고,
-    눌러도 스토어로 튕기기만 해서 검색 결과로서 아무 값이 없다.
-
-    robots.txt 의 Disallow 가 아니라 noindex 메타를 쓴 것은 의도적이다.
-    Disallow 를 걸면 크롤러가 페이지를 아예 안 읽어서 이 noindex 를 못 본다.
-    URL 만 남은 채로 색인에 남는 최악이 된다. 크롤은 허용하고 색인만 막는다.
-    follow 는 유지 — 스토어 링크로 나가는 신호는 살려둔다.
+    검색에서 빼는 이유: 이 페이지는 스토어로 보내는 리디렉터다. 색인되면
+    "HAVIT 앱" 같은 브랜드 검색에서 홈페이지 대신 이 페이지가 뜰 수 있다.
+    robots.txt 의 Disallow 가 아니라 noindex 메타를 쓴 것은 의도적이다
+    (Disallow 면 크롤러가 이 noindex 를 못 읽는다). 크롤 허용·색인만 차단.
   -->
   <meta name="robots" content="noindex, follow">
 
-  <!-- OG 태그 -->
-  <meta property="og:title" content="HAVIT — Your AI Weight Loss Coach" />
-  <meta property="og:description" content="Science-based AI coaching, 24/7. Start your personalized weight loss journey today." />
+  <!--
+    OG 는 공유 미리보기용이라 크롤러가 한 번 읽고 끝난다 — 기기 언어별로 바꿀 수 없다
+    (GitHub Pages 정적 호스팅 + 크롤러는 언어 헤더를 거의 안 보낸다). 홈페이지 기본(영문)
+    OG 와 같은 문구·이미지로 맞춘다.
+  -->
+  <meta property="og:title" content="HAVIT — AI Weight Loss Coach | Lose Weight, Keep Muscle" />
+  <meta property="og:description" content="Meet HAVI, the AI weight loss coach that tells you what to do today. Photo food scan, body composition estimates, and GLP-1 support in one app." />
   <meta property="og:image" content="https://app.aihavit.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
   <meta property="og:url" content="https://app.aihavit.com" />
   <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
 
-  <!-- GA4. blog.aihavit.com / www.aihavit.com 과 같은 속성이라, 유입부터
-       스토어 이탈까지가 한 보고서에서 이어진다. -->
+  <!-- GA4. www.aihavit.com 과 같은 속성 — 유입부터 스토어 이탈까지 한 보고서에서 이어진다. -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4NEXM0LNTK"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -33,41 +35,166 @@
     gtag('js', new Date());
     gtag('config', 'G-4NEXM0LNTK');
   </script>
+
+  <style>
+    :root { --lime: #d4ff50; --black: #000; --grey: #666; --bg: #f2f2f2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: var(--bg); color: var(--black);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif; }
+    .card { width: min(440px, calc(100% - 32px)); background: #fff; border-radius: 28px; padding: 40px 32px;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,.06); }
+    .logo { height: 40px; margin-bottom: 24px; }
+    h1 { font-size: 24px; line-height: 1.3; margin: 0 0 8px; letter-spacing: -0.5px; }
+    p { margin: 0; color: var(--grey); font-size: 15px; line-height: 1.5; }
+    .qr { margin: 28px auto 8px; width: 200px; height: 200px; padding: 12px; border-radius: 20px; background: #fff;
+      border: 2px solid var(--lime); }
+    .qr img, .qr svg { width: 100%; height: 100%; display: block; }
+    .hint { font-size: 13px; margin-bottom: 24px; }
+    .badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .badges img { height: 48px; display: block; }
+    .redirect { display: none; }
+    .redirect a { color: var(--black); font-weight: 600; }
+    body.is-mobile .desktop { display: none; }
+    body.is-mobile .redirect { display: block; }
+    .debug { margin-top: 24px; text-align: left; font: 12px/1.5 ui-monospace, Menlo, monospace; word-break: break-all;
+      background: #f7f7f7; padding: 12px; border-radius: 12px; color: #333; }
+  </style>
 </head>
 <body>
-<script>
-  var ANDROID = "https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness";
-  var IOS = "https://apps.apple.com/us/app/havit-ai-weight-loss-coach/id6755166023";
+  <main class="card">
+    <img class="logo" src="havit-logo.svg" alt="HAVIT" />
 
-  var ua = navigator.userAgent || navigator.vendor;
-  var platform, target;
-  if (/android/i.test(ua)) {
-    platform = "android"; target = ANDROID;
-  } else if (/iPad|iPhone|iPod/.test(ua)) {
-    platform = "ios"; target = IOS;
-  } else {
-    platform = "other"; target = ANDROID;
-  }
+    <section class="desktop">
+      <h1 data-t="title">HAVIT — AI Weight Loss Coach</h1>
+      <p data-t="desc">Lose weight, keep muscle. Your AI coach tells you what to do today.</p>
+      <div class="qr" id="qr" aria-label="QR code"></div>
+      <p class="hint" data-t="scan">Scan with your phone camera to install.</p>
+      <div class="badges">
+        <a id="badge-ios" href="https://apps.apple.com/app/id6755166023" target="_blank" rel="noopener">
+          <img src="badge-appstore.webp" alt="Download on the App Store" /></a>
+        <a id="badge-android" href="https://play.google.com/store/apps/details?id=com.aiconnects.havitWellness" target="_blank" rel="noopener">
+          <img src="badge-googleplay.webp" alt="Get it on Google Play" /></a>
+      </div>
+    </section>
 
-  // 계측과 속도의 절충. gtag 는 async 라 리디렉트가 먼저 일어나면 히트가
-  // 통째로 유실된다. event_callback 으로 전송 직후 넘기되, 스크립트가 아직
-  // 안 떴을 때를 대비해 350ms 에서 무조건 끊는다. 설치 흐름에 이 이상은
-  // 얹을 수 없다. 계측이 이 지연만큼의 값어치가 없다고 판단되면 gtag 호출을
-  // 지우고 go() 를 즉시 부르면 원래 동작으로 돌아간다.
-  var moved = false;
-  function go() {
-    if (moved) return;
-    moved = true;
-    window.location.replace(target);
-  }
+    <section class="redirect">
+      <h1 data-t="opening">Opening the app store…</h1>
+      <p><a id="fallback" href="#" data-t="fallback">Tap here if nothing happens</a></p>
+    </section>
 
-  gtag("event", "app_redirect", {
-    platform: platform,
-    event_callback: go,
-    event_timeout: 350
-  });
-  setTimeout(go, 350);
-</script>
-<p>잠시 후 이동합니다...</p>
+    <div class="debug" id="debug" hidden></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script>
+  (function () {
+    // ── 언어: 기기 언어가 한국어면 한국어, 그 외는 영어 ─────────────────────────────
+    var lang = ((navigator.languages && navigator.languages[0]) || navigator.language || 'en').toLowerCase();
+    var T = lang.indexOf('ko') === 0 ? {
+      title: 'AI 다이어트 코치 하비트',
+      desc: '살은 빼고 근육은 지키세요. AI 코치가 오늘 할 일을 알려드려요.',
+      scan: '휴대폰 카메라로 QR코드를 찍으면 바로 설치할 수 있어요.',
+      opening: '앱 스토어로 이동 중이에요…',
+      fallback: '이동하지 않으면 여기를 누르세요',
+      doc: '하비트 앱 받기 — AI 다이어트 코치'
+    } : null;
+    if (T) {
+      document.documentElement.lang = 'ko';
+      document.title = T.doc;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) {
+        var k = el.getAttribute('data-t'); if (T[k]) el.textContent = T[k];
+      });
+    }
+
+    // ── 귀속: 스토어 직링크 대신 AppsFlyer OneLink(crNQ) 로 보낸다 ─────────────────
+    // 직링크로 나가면 이 링크를 거친 설치가 AppsFlyer 에 전부 오가닉으로 잡힌다.
+    //
+    // 우선순위 (위에서 걸리면 아래는 안 본다)
+    //  1) 이미 pid 가 붙어 온 링크  → 받은 쿼리를 **한 글자도 바꾸지 않고** 그대로 넘긴다.
+    //     impact.com 등 파트너가 af_siteid / af_sub1~4 / clickid 를 실어 보내는 경우를 보존하기 위함.
+    //     (서버 affiliate_external_touch_usecase 는 pid=impactradius_int 일 때 af_sub1~4·clickid 를 읽는다)
+    //  2) irclickid (impact 딥링크)   → pid=impactradius_int, clickid=irclickid
+    //  3) oppref (ChatGPT 광고 클릭 ID, OpenAI 가 자동 부착) → pid=openai_int, clickid=oppref
+    //  4) utm_source / 광고 클릭 ID   → 홈페이지 Smart Script 와 같은 매체 이름(*_web)
+    //  5) 아무것도 없음               → pid=website, c=app_link (자사 링크)
+    // 1) 이외에는 utm_* 외의 받은 파라미터를 그대로 덧붙인다(파트너가 보낸 값을 버리지 않는다).
+    var ONELINK = 'https://havit.onelink.me/crNQ';
+    var p = new URLSearchParams(location.search);
+    var debug = p.get('_debug') === '1';
+    p.delete('_debug');
+
+    var WEB_SOURCE = {
+      facebook: 'meta_web', fb: 'meta_web', instagram: 'meta_web', ig: 'meta_web', meta: 'meta_web',
+      google: 'google_web', youtube: 'google_web', tiktok: 'tiktok_web', naver: 'naver_web', kakao: 'kakao_web',
+      chatgpt: 'openai_int', openai: 'openai_int'
+    };
+
+    function buildQuery() {
+      if (p.has('pid')) return { q: new URLSearchParams(p), rule: 'passthrough' };
+      var q = new URLSearchParams();
+      // utm_* 는 아래에서 AppsFlyer 칸으로 옮기고, 나머지(파트너 값·클릭 ID)는 그대로 실어 보낸다.
+      p.forEach(function (v, k) { if (k.indexOf('utm_') !== 0) q.append(k, v); });
+      var pid, rule;
+      if (p.has('irclickid')) { pid = 'impactradius_int'; q.set('clickid', p.get('irclickid')); rule = 'impact'; }
+      else if (p.has('oppref')) { pid = 'openai_int'; q.set('clickid', p.get('oppref')); rule = 'chatgpt'; }
+      else if (p.has('utm_source')) {
+        var s = p.get('utm_source').toLowerCase(); pid = WEB_SOURCE[s] || s; rule = 'utm';
+      }
+      else if (p.has('gclid') || p.has('gbraid') || p.has('wbraid')) { pid = 'google_web'; rule = 'clickid'; }
+      else if (p.has('fbclid')) { pid = 'meta_web'; rule = 'clickid'; }
+      else if (p.has('ttclid')) { pid = 'tiktok_web'; rule = 'clickid'; }
+      else { pid = 'website'; rule = 'owned'; }
+      q.set('pid', pid);
+      if (!q.has('c')) q.set('c', p.get('utm_campaign') || 'app_link');
+      if (p.has('utm_medium') && !q.has('af_channel')) q.set('af_channel', p.get('utm_medium'));
+      if (p.has('utm_content') && !q.has('af_ad')) q.set('af_ad', p.get('utm_content'));
+      if (p.has('utm_term') && !q.has('af_keywords')) q.set('af_keywords', p.get('utm_term'));
+      if (!q.has('af_adset')) q.set('af_adset', 'app_link');
+      return { q: q, rule: rule };
+    }
+
+    var ua = navigator.userAgent || navigator.vendor || '';
+    var isAndroid = /android/i.test(ua);
+    // iPadOS 는 UA 가 Mac 으로 나와서 터치 포인트로 가른다.
+    var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var platform = isAndroid ? 'android' : isIOS ? 'ios' : 'desktop';
+    var built = buildQuery();
+    var target = ONELINK + '?' + built.q.toString();
+
+    if (debug) {
+      var d = document.getElementById('debug');
+      d.hidden = false;
+      d.textContent = 'platform=' + platform + '\nrule=' + built.rule + '\ntarget=' + target;
+    }
+
+    if (platform === 'desktop') {
+      // PC 는 설치할 수 없으니 이동하지 않는다. QR 에는 지금 주소를 그대로 담는다 —
+      // 폰으로 찍으면 같은 파라미터로 이 페이지가 다시 열려 귀속이 유지된다.
+      try {
+        var qr = qrcode(0, 'M');
+        qr.addData(location.href.replace(/[?&]_debug=1/, ''));
+        qr.make();
+        document.getElementById('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+      } catch (e) { document.getElementById('qr').style.display = 'none'; }
+      gtag('event', 'app_redirect', { platform: platform, media_source: built.q.get('pid'), rule: built.rule, destination: 'qr_page' });
+      return;
+    }
+
+    document.body.classList.add('is-mobile');
+    document.getElementById('fallback').setAttribute('href', target);
+    if (debug) return;
+
+    // 계측과 속도의 절충: gtag 는 async 라 바로 이동하면 히트가 유실된다.
+    // 전송 콜백으로 넘기되 350ms 에서 무조건 끊는다.
+    var moved = false;
+    function go() { if (moved) return; moved = true; window.location.replace(target); }
+    gtag('event', 'app_redirect', {
+      platform: platform, media_source: built.q.get('pid'), rule: built.rule, destination: 'onelink',
+      event_callback: go, event_timeout: 350
+    });
+    setTimeout(go, 350);
+  })();
+  </script>
 </body>
 </html>
