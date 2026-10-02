@@ -178,11 +178,18 @@
     }
 
     if (platform === 'desktop') {
-      // PC 는 설치할 수 없으니 이동하지 않는다. QR 에는 지금 주소를 그대로 담는다 —
-      // 폰으로 찍으면 같은 파라미터로 이 페이지가 다시 열려 귀속이 유지된다.
+      // PC 는 설치할 수 없으니 이동하지 않는다. QR 에는 폰에서 만들 OneLink 를 그대로 담는다 —
+      // 폰이 이 페이지를 다시 거치지 않고 바로 OneLink 로 가며, 귀속 값도 같다.
+      // (예전엔 지금 주소를 담았는데, 로컬에선 localhost 가 들어가 폰에서 열리지 않았다.)
+      // 파트너 링크(passthrough)와 af_adset 을 직접 받은 경우는 손대지 않고,
+      // 그 외에는 af_adset=desktop_qr 로 PC→QR 경유 클릭·설치를 AppsFlyer 에서 구분한다.
+      var qrQuery = new URLSearchParams(built.q);
+      if (built.rule !== 'passthrough' && !p.has('af_adset')) qrQuery.set('af_adset', 'desktop_qr');
+      var qrTarget = ONELINK + '?' + qrQuery.toString();
+      if (debug) document.getElementById('debug').textContent += '\nqr=' + qrTarget;
       try {
         var qr = qrcode(0, 'M');
-        qr.addData(location.href.replace(/[?&]_debug=1/, ''));
+        qr.addData(qrTarget);
         qr.make();
         document.getElementById('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
       } catch (e) { document.getElementById('qr').style.display = 'none'; }
