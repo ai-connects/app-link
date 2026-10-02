@@ -16,7 +16,7 @@ app.aihavit.com — 앱 다운로드 링크 한 장.
 | `gclid` / `fbclid` / `ttclid`만 있음 | `pid=google_web` / `meta_web` / `tiktok_web` |
 | 아무것도 없음 | `pid=website&c=app_link` |
 
-utm 값은 AppsFlyer 칸으로 옮겨 넣습니다(`c`=utm_campaign, `af_channel`=utm_medium, `af_ad`=utm_content, `af_keywords`=utm_term). 그 외 받은 파라미터(파트너 값, 클릭 ID)는 버리지 않고 그대로 실어 보냅니다.
+utm 값은 AppsFlyer 칸으로 옮겨 넣습니다(`c`=utm_campaign, `af_channel`=utm_medium, `af_ad`=utm_content, `af_keywords`=utm_term). Google Ads 가 붙이는 `keyword`(최종 URL 접미사 `{keyword}`)가 있으면 utm_term 보다 먼저 `af_keywords` 로 씁니다. 그 외 받은 파라미터(파트너 값, 클릭 ID)는 버리지 않고 그대로 실어 보냅니다.
 
 ## 확인
 주소 뒤에 `?_debug=1`을 붙이면 이동하지 않고, 만들어진 목적지 URL을 화면에 보여줍니다.
