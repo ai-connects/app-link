@@ -36,6 +36,10 @@
     gtag('config', 'G-4NEXM0LNTK');
   </script>
 
+  <!-- OpenAI(ChatGPT 광고) 측정 픽셀. init 만으로 랜딩 URL 의 oppref(클릭 ID)를 __oppref 쿠키에 저장한다.
+       이벤트는 ChatGPT 광고 유입일 때만 아래 스크립트가 보낸다. 앱 설치·가입·결제는 AppsFlyer 연동이 서버로 보낸다. -->
+  <script>!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"C5o7rmB5pD4mEUU8yayZ8N"});</script>
+
   <style>
     :root { --lime: #d4ff50; --black: #000; --grey: #666; --bg: #f2f2f2; }
     * { box-sizing: border-box; }
@@ -178,6 +182,8 @@
     var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var platform = isAndroid ? 'android' : isIOS ? 'ios' : 'desktop';
     var built = buildQuery();
+    // ChatGPT 광고 유입 = oppref(OpenAI 클릭 ID) 또는 pid=openai_int 로 귀속되는 경우.
+    var fromChatGPT = built.q.get('pid') === 'openai_int' || p.has('oppref');
     var target = ONELINK + '?' + built.q.toString();
 
     if (debug) {
@@ -203,6 +209,9 @@
         document.getElementById('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
       } catch (e) { document.getElementById('qr').style.display = 'none'; }
       gtag('event', 'app_redirect', { platform: platform, media_source: built.q.get('pid'), rule: built.rule, destination: 'qr_page' });
+      if (fromChatGPT) {
+        oaiq('measure', 'page_viewed', { type: 'contents', contents: [{ id: 'app_link_qr', name: 'App download QR page', content_type: 'page' }] });
+      }
       return;
     }
 
@@ -214,11 +223,18 @@
     // 전송 콜백으로 넘기되 350ms 에서 무조건 끊는다.
     var moved = false;
     function go() { if (moved) return; moved = true; window.location.replace(target); }
+    // ChatGPT 광고 유입이면 스토어로 넘기기 직전을 OpenAI 픽셀 전환(app_store_redirect)으로 보낸다.
+    // 픽셀 스크립트가 아직 안 떴을 수 있어 이 경우에만 최대 900ms 기다린다(그 외 유입은 350ms 그대로).
+    var waitMs = 350;
+    if (fromChatGPT) {
+      oaiq('measure', 'custom', { type: 'custom' }, { custom_event_name: 'app_store_redirect' });
+      waitMs = 900;
+    }
     gtag('event', 'app_redirect', {
       platform: platform, media_source: built.q.get('pid'), rule: built.rule, destination: 'onelink',
-      event_callback: go, event_timeout: 350
+      event_callback: fromChatGPT ? undefined : go, event_timeout: 350
     });
-    setTimeout(go, 350);
+    setTimeout(go, waitMs);
   })();
   </script>
 </body>
