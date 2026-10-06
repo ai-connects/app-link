@@ -135,9 +135,16 @@
     //     (서버 affiliate_external_touch_usecase 는 pid=impactradius_int 일 때 af_sub1~4·clickid 를 읽는다)
     //  2) irclickid (impact 딥링크)   → pid=impactradius_int, clickid=irclickid
     //  3) oppref (ChatGPT 광고 클릭 ID, OpenAI 가 자동 부착) → pid=openai_int, clickid=oppref
-    //  4) utm_source / 광고 클릭 ID   → 홈페이지 Smart Script 와 같은 매체 이름(*_web)
-    //  5) 아무것도 없음               → pid=website, c=app_link (자사 링크)
-    // 1) 이외에는 utm_* 외의 받은 파라미터를 그대로 덧붙인다(파트너가 보낸 값을 버리지 않는다).
+    //  4) utm_source                  → 홈페이지 Smart Script 와 같은 매체 이름(*_web)
+    //  5) gclid·gbraid·wbraid / ttclid → google_web / tiktok_web. 광고 클릭에만 붙으므로 ch 보다 먼저 본다.
+    //  6) ch (우리가 직접 만든 링크) → pid=ch 값 그대로(소문자). utm_source 와 달리 *_web 으로 바꾸지 않아
+    //     ch=instagram 같은 무료 유입이 유료 웹 광고(meta_web)와 섞이지 않는다.
+    //     utm_source 보다 아래인 이유: 서버 랜딩(/qr/·추천인 등)은 매체를 utm_source 로 정해 보내면서 랜딩 주소의
+    //     나머지 값을 그대로 넘기고, 광고 플랫폼도 utm_source 를 덧붙인다 — 둘 다 링크에 박힌 ch 보다 우선해야 한다.
+    //  7) fbclid                      → meta_web. 페이스북·인스타는 광고가 아닌 게시물·프로필 링크에도 fbclid 를
+    //     자동으로 붙여서 ch 보다 아래에 둔다(위에 두면 ch=insta_bio 가 meta_web 으로 바뀐다).
+    //  8) 아무것도 없음               → pid=website, c=app_link (자사 링크)
+    // 1) 이외에는 utm_*·ch 외의 받은 파라미터를 그대로 덧붙인다(파트너가 보낸 값을 버리지 않는다).
     var ONELINK = 'https://havit.onelink.me/crNQ';
     var p = new URLSearchParams(location.search);
     var debug = p.get('_debug') === '1';
@@ -152,15 +159,18 @@
     function buildQuery() {
       if (p.has('pid')) return { q: new URLSearchParams(p), rule: 'passthrough' };
       var q = new URLSearchParams();
-      // utm_* 는 아래에서 AppsFlyer 칸으로 옮기고, 나머지(파트너 값·클릭 ID)는 그대로 실어 보낸다.
-      p.forEach(function (v, k) { if (k.indexOf('utm_') !== 0) q.append(k, v); });
+      // utm_*·ch 는 아래에서 AppsFlyer 칸으로 옮기고, 나머지(파트너 값·클릭 ID)는 그대로 실어 보낸다.
+      p.forEach(function (v, k) { if (k.indexOf('utm_') !== 0 && k !== 'ch') q.append(k, v); });
       var pid, rule;
+      var ch = (p.get('ch') || '').trim().toLowerCase();
       if (p.has('irclickid')) { pid = 'impactradius_int'; q.set('clickid', p.get('irclickid')); rule = 'impact'; }
       else if (p.has('oppref')) { pid = 'openai_int'; q.set('clickid', p.get('oppref')); rule = 'chatgpt'; }
       else if (p.has('utm_source')) {
         var s = p.get('utm_source').toLowerCase(); pid = WEB_SOURCE[s] || s; rule = 'utm';
       }
       else if (p.has('gclid') || p.has('gbraid') || p.has('wbraid')) { pid = 'google_web'; rule = 'clickid'; }
+      // ttclid 도 ch 보다 먼저지만, 기존 fbclid > ttclid 순서를 바꾸지 않으려고 아래 줄을 그대로 두고 여기서 비켜 간다.
+      else if (ch && !p.has('ttclid')) { pid = ch; rule = 'ch'; }
       else if (p.has('fbclid')) { pid = 'meta_web'; rule = 'clickid'; }
       else if (p.has('ttclid')) { pid = 'tiktok_web'; rule = 'clickid'; }
       else { pid = 'website'; rule = 'owned'; }
