@@ -12,8 +12,8 @@ app.aihavit.com — 앱 다운로드 링크 한 장.
 | `pid`가 이미 붙어 있음 (impact 등 파트너 링크) | 받은 쿼리를 **한 글자도 바꾸지 않고** 그대로 |
 | `irclickid` (impact 딥링크) | `pid=impactradius_int&clickid={irclickid}` |
 | `oppref` (ChatGPT 광고 클릭 ID) | `pid=openai_int&clickid={oppref}` |
-| `ch=…` (우리가 직접 만든 링크) | `pid={ch}` 소문자로 **그대로** (`*_web`으로 바꾸지 않음) |
 | `utm_source=…` | `pid={utm_source}` (facebook·google·chatgpt 등은 `*_web` / `openai_int`로 정리) |
+| `ch=…` (우리가 직접 만든 링크) | `pid={ch}` 소문자로 **그대로** (`*_web`으로 바꾸지 않음) |
 | `gclid` / `fbclid` / `ttclid`만 있음 | `pid=google_web` / `meta_web` / `tiktok_web` |
 | 아무것도 없음 | `pid=website&c=app_link` |
 
@@ -28,6 +28,7 @@ utm 값은 AppsFlyer 칸으로 옮겨 넣습니다(`c`=utm_campaign, `af_channel
 | `app.aihavit.com/?ch=instagram` | `instagram` | `utm_source=instagram` 이면 `meta_web` 이 되는 것과 다름 |
 | `app.aihavit.com/?ch=kakao_ch&c=oct_event&utm_medium=chat` | `kakao_ch` | `c=oct_event`, `af_channel=chat` |
 
+- `utm_source` 가 같이 있으면 `utm_source` 가 이깁니다. 서버 랜딩(`/qr/`·추천인 등)이 매체를 `utm_source` 로 정해 보내고, 광고 플랫폼도 `utm_source` 를 덧붙이기 때문입니다. `fbclid` 같은 광고 클릭 ID 보다는 `ch` 가 이깁니다.
 - 오타도 그대로 다른 매체가 됩니다(`insta_bio` ≠ `insat_bio`). 쓰는 값을 팀에서 정해 두세요.
 - `_int` 로 끝나는 이름은 AppsFlyer 연동 파트너 전용이라 쓰지 않습니다. `meta_web`·`google_web` 같은 기존 유료 매체 이름도 피하세요.
 

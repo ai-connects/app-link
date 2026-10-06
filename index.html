@@ -135,11 +135,14 @@
     //     (서버 affiliate_external_touch_usecase 는 pid=impactradius_int 일 때 af_sub1~4·clickid 를 읽는다)
     //  2) irclickid (impact 딥링크)   → pid=impactradius_int, clickid=irclickid
     //  3) oppref (ChatGPT 광고 클릭 ID, OpenAI 가 자동 부착) → pid=openai_int, clickid=oppref
-    //  4) ch (우리가 직접 만든 링크) → pid=ch 값 그대로(소문자). utm_source 와 달리 *_web 으로 바꾸지 않아
-    //     ch=instagram 같은 무료 유입이 유료 웹 광고(meta_web)와 섞이지 않는다. 광고 클릭 ID 보다 위라
-    //     페이스북 등이 fbclid 를 자동으로 붙여도 ch 가 이긴다. 2)·3) 은 정산이 걸린 값이라 ch 보다 먼저 본다.
-    //  5) utm_source / 광고 클릭 ID   → 홈페이지 Smart Script 와 같은 매체 이름(*_web)
-    //  6) 아무것도 없음               → pid=website, c=app_link (자사 링크)
+    //  4) utm_source                  → 홈페이지 Smart Script 와 같은 매체 이름(*_web)
+    //  5) ch (우리가 직접 만든 링크) → pid=ch 값 그대로(소문자). utm_source 와 달리 *_web 으로 바꾸지 않아
+    //     ch=instagram 같은 무료 유입이 유료 웹 광고(meta_web)와 섞이지 않는다.
+    //     utm_source 보다 아래인 이유: 서버 랜딩(/qr/·추천인 등)은 매체를 utm_source 로 정해 보내면서 랜딩 주소의
+    //     나머지 값을 그대로 넘기고, 광고 플랫폼도 utm_source 를 덧붙인다 — 둘 다 링크에 박힌 ch 보다 우선해야 한다.
+    //     광고 클릭 ID 보다는 위라 페이스북 등이 fbclid 를 자동으로 붙여도 ch 가 이긴다.
+    //  6) 광고 클릭 ID                → google_web / meta_web / tiktok_web
+    //  7) 아무것도 없음               → pid=website, c=app_link (자사 링크)
     // 1) 이외에는 utm_*·ch 외의 받은 파라미터를 그대로 덧붙인다(파트너가 보낸 값을 버리지 않는다).
     var ONELINK = 'https://havit.onelink.me/crNQ';
     var p = new URLSearchParams(location.search);
@@ -161,10 +164,10 @@
       var ch = (p.get('ch') || '').trim().toLowerCase();
       if (p.has('irclickid')) { pid = 'impactradius_int'; q.set('clickid', p.get('irclickid')); rule = 'impact'; }
       else if (p.has('oppref')) { pid = 'openai_int'; q.set('clickid', p.get('oppref')); rule = 'chatgpt'; }
-      else if (ch) { pid = ch; rule = 'ch'; }
       else if (p.has('utm_source')) {
         var s = p.get('utm_source').toLowerCase(); pid = WEB_SOURCE[s] || s; rule = 'utm';
       }
+      else if (ch) { pid = ch; rule = 'ch'; }
       else if (p.has('gclid') || p.has('gbraid') || p.has('wbraid')) { pid = 'google_web'; rule = 'clickid'; }
       else if (p.has('fbclid')) { pid = 'meta_web'; rule = 'clickid'; }
       else if (p.has('ttclid')) { pid = 'tiktok_web'; rule = 'clickid'; }
