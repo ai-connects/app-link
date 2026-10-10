@@ -15,12 +15,20 @@
 
   <!--
     OG 는 공유 미리보기용이라 크롤러가 한 번 읽고 끝난다 — 기기 언어별로 바꿀 수 없다
-    (GitHub Pages 정적 호스팅 + 크롤러는 언어 헤더를 거의 안 보낸다). 홈페이지 기본(영문)
-    OG 와 같은 문구·이미지로 맞춘다.
+    (GitHub Pages 정적 호스팅 + 본문 34개 언어는 navigator.languages 로 클라에서만 갈린다).
+    홈페이지 기본(영문) OG 와 같은 문구·이미지로 맞춘다.
+
+    이미지는 **www 의 파일을 직접 가리킨다.** 여기에 사본을 두면 www 가 카드를 바꿀 때
+    따라가지 않는다 — 실제로 그래서 2026-10-02 교체분이 반영되지 않았다.
+
+    그리고 **URL 을 바꿔야 반영된다.** 카카오톡은 og:image 를 URL 단위로 캐시하고 HTML 을
+    다시 읽어도 그 캐시를 안 버린다. 이 파일은 `og-image.png` 라는 한 URL 의 내용만 세 번
+    갈아끼웠고(2026-03-23 / 10-02 / 10-11), 그 결과 2026-10-11 미리보기는 제목만 새것이고
+    이미지는 2026-03-23 자 카드였다. 로컬 og-image.png 는 지운다.
   -->
   <meta property="og:title" content="HAVIT — AI Weight Loss Coach | Everything in One App" />
   <meta property="og:description" content="HAVI reads your meals, weight, body composition and sleep, then tells you one thing to do today. 4× more likely to lose 5%+ in a 12-week study." />
-  <meta property="og:image" content="https://app.aihavit.com/og-image.png" />
+  <meta property="og:image" content="https://www.aihavit.com/og/en.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:url" content="https://app.aihavit.com" />
